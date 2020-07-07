@@ -1,8 +1,7 @@
 package com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.gitlab;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 import org.sonar.api.server.ws.Request;
@@ -20,12 +19,13 @@ public class SetGitlabBindingActionTest {
         ComponentFinder componentFinder = mock(ComponentFinder.class);
 
         Request request = mock(Request.class);
+        when(request.mandatoryParam("repository")).thenReturn("repositoryId");
 
         SetGitlabBindingAction testCase = new SetGitlabBindingAction(dbClient, componentFinder, userSession);
         ProjectAlmSettingDto result = testCase.createProjectAlmSettingDto("projectUuid", "settingsUuid", request);
 
-        assertThat(result).isEqualToComparingFieldByField(new ProjectAlmSettingDto().setProjectUuid("projectUuid").setAlmSettingUuid("settingsUuid"));
-        verifyNoMoreInteractions(request);
-
+        assertThat(result).isEqualToComparingFieldByField(new ProjectAlmSettingDto().setProjectUuid("projectUuid").setAlmSettingUuid("settingsUuid").setAlmRepo("repositoryId"));
+        verify(request).mandatoryParam("repository");
+        //verifyNoMoreInteractions(request);
     }
 }
