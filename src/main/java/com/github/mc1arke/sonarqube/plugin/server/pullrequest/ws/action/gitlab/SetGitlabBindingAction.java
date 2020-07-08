@@ -21,19 +21,13 @@ package com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.gitlab;
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.SetBindingAction;
 import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.WebService;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
 import org.sonar.db.DbClient;
 import org.sonar.db.alm.setting.ProjectAlmSettingDto;
 import org.sonar.server.component.ComponentFinder;
 import org.sonar.server.user.UserSession;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 public class SetGitlabBindingAction extends SetBindingAction {
-    private static final Logger LOGGER = Loggers.get(SetGitlabBindingAction.class);
+    private static final String REPOSITORY_PARAMETER = "repository";
 
     public SetGitlabBindingAction(DbClient dbClient, ComponentFinder componentFinder, UserSession userSession) {
         super(dbClient, componentFinder, userSession, "set_gitlab_binding");
@@ -42,18 +36,15 @@ public class SetGitlabBindingAction extends SetBindingAction {
     @Override
     protected void configureAction(WebService.NewAction action) {
         super.configureAction(action);
-
-        action.createParam("repository").setRequired(true);
+        action.createParam(REPOSITORY_PARAMETER).setRequired(true);
     }
 
     @Override
     protected ProjectAlmSettingDto createProjectAlmSettingDto(String projectUuid, String settingsUuid,
                                                               Request request) {
-        LOGGER.error(String.join(",", request.getParams().keySet()));
-
         return new ProjectAlmSettingDto()
                 .setProjectUuid(projectUuid)
                 .setAlmSettingUuid(settingsUuid)
-                .setAlmRepo(request.mandatoryParam("repository"));
+                .setAlmRepo(request.mandatoryParam(REPOSITORY_PARAMETER));
     }
 }
