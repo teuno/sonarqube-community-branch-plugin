@@ -29,5 +29,5 @@ import java.security.GeneralSecurityException;
 
 public interface CheckRunProvider {
     DecorationResult createCheckRun(AnalysisDetails analysisDetails, AlmSettingDto almSettingDto,
-                                    ProjectAlmSettingDto projectAlmSettingDto) throws IOException, GeneralSecurityException;
+                                    ProjectAlmSettingDto projectAlmSettingDto, IssueFilterRunner issueFilterRunner) throws IOException, GeneralSecurityException;
 }
