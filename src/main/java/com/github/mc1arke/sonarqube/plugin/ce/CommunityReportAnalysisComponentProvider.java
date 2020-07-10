@@ -39,9 +39,9 @@ public class CommunityReportAnalysisComponentProvider implements ReportAnalysisC
     @Override
     public List<Object> getComponents() {
         return Arrays.asList(CommunityBranchLoaderDelegate.class, PullRequestPostAnalysisTask.class,
-                             PostAnalysisIssueVisitor.class, GithubPullRequestDecorator.class,
-                             GraphqlCheckRunProvider.class, DefaultLinkHeaderReader.class, RestApplicationAuthenticationProvider.class,
-                             BitbucketPullRequestDecorator.class, GitlabServerPullRequestDecorator.class);
+        PostAnalysisIssueVisitor.class, GithubPullRequestDecorator.class,
+                GraphqlCheckRunProvider.class, DefaultLinkHeaderReader.class, RestApplicationAuthenticationProvider.class,
+                BitbucketPullRequestDecorator.class, GitlabServerPullRequestDecorator.class);
     }
 
 }
