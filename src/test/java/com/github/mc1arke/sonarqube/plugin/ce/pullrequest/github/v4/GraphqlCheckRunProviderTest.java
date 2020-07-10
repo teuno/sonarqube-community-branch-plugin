@@ -184,40 +184,46 @@ public class GraphqlCheckRunProviderTest {
 
     @Test
     public void createCheckRunHappyPathOkStatus() throws IOException, GeneralSecurityException {
-        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain", "http://api.target.domain/graphql");
+        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain", "http://api.target.domain/graphql",null);
     }
 
     @Test
     public void createCheckRunHappyPathOkStatusTrailingSlash() throws IOException, GeneralSecurityException {
-        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain/", "http://api.target.domain/graphql");
+        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain/", "http://api.target.domain/graphql",null);
     }
 
     @Test
     public void createCheckRunHappyPathOkStatusApiPath() throws IOException, GeneralSecurityException {
-        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain/api", "http://api.target.domain/api/graphql");
+        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain/api", "http://api.target.domain/api/graphql",null);
     }
 
     @Test
     public void createCheckRunHappyPathOkStatusApiPathTrailingSlash() throws IOException, GeneralSecurityException {
-        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain/api/", "http://api.target.domain/api/graphql");
+        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain/api/", "http://api.target.domain/api/graphql",null);
     }
 
     @Test
     public void createCheckRunHappyPathOkStatusV3Path() throws IOException, GeneralSecurityException {
-        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain/api/v3", "http://api.target.domain/api/graphql");
+        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain/api/v3", "http://api.target.domain/api/graphql",null);
     }
 
     @Test
     public void createCheckRunHappyPathOkStatusV3PathTrailingSlash() throws IOException, GeneralSecurityException {
-        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain/api/v3/", "http://api.target.domain/api/graphql");
+        createCheckRunHappyPath(QualityGate.Status.OK, "http://api.target.domain/api/v3/", "http://api.target.domain/api/graphql",null);
     }
 
     @Test
     public void createCheckRunHappyPathErrorStatus() throws IOException, GeneralSecurityException {
-        createCheckRunHappyPath(QualityGate.Status.ERROR, "http://abc.de/", "http://abc.de/graphql");
+        createCheckRunHappyPath(QualityGate.Status.ERROR, "http://abc.de/", "http://abc.de/graphql",null);
     }
 
-    private void createCheckRunHappyPath(QualityGate.Status status, String basePath, String fullPath) throws IOException, GeneralSecurityException {
+    @Test
+    public void checkIfFilterIsCalled() throws IOException, GeneralSecurityException {
+        IssueFilterRunner issueFilterRunner = mock(IssueFilterRunner.class);
+        createCheckRunHappyPath(QualityGate.Status.ERROR, "http://abc.de/", "http://abc.de/graphql",issueFilterRunner);
+    }
+
+    private void createCheckRunHappyPath(QualityGate.Status status, String basePath, String fullPath, IssueFilterRunner issueFilterRunner) throws IOException, GeneralSecurityException {
         String[] messageInput = {
             "issue 1",
             "issue 2",
@@ -351,6 +357,8 @@ public class GraphqlCheckRunProviderTest {
         PostAnalysisIssueVisitor postAnalysisIssueVisitor = mock(PostAnalysisIssueVisitor.class);
         when(postAnalysisIssueVisitor.getIssues()).thenReturn(issueList);
 
+        if(issueFilterRunner != null) when(issueFilterRunner.filterIssues(issueList)).thenReturn(issueList);
+
         when(analysisDetails.getQualityGateStatus()).thenReturn(status);
         when(analysisDetails.createAnalysisSummary(any())).thenReturn("dummy summary");
         when(analysisDetails.getCommitSha()).thenReturn("commit SHA");
@@ -418,7 +426,10 @@ public class GraphqlCheckRunProviderTest {
 
         GraphqlCheckRunProvider testCase =
                 new GraphqlCheckRunProvider(graphqlProvider, clock, githubApplicationAuthenticationProvider, server);
-        testCase.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto,null);
+        testCase.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto,issueFilterRunner);
+
+        if(issueFilterRunner != null) verify(issueFilterRunner, times(1)).filterIssues(issueList);
+
 
         assertEquals(1, requestBuilders.size());
 
@@ -650,5 +661,4 @@ public class GraphqlCheckRunProviderTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("No App ID has been set for Github connections");
     }
-
 }
