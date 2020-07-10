@@ -21,6 +21,7 @@ package com.github.mc1arke.sonarqube.plugin.ce.pullrequest.github.v4;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.AnalysisDetails;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.PostAnalysisIssueVisitor;
+import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.commentfilter.IssueFilterRunner;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.github.GithubApplicationAuthenticationProvider;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.github.RepositoryAuthenticationToken;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.github.v4.model.CheckAnnotationLevel;
@@ -123,7 +124,7 @@ public class GraphqlCheckRunProviderTest {
 
         GraphqlCheckRunProvider testCase =
                 new GraphqlCheckRunProvider(graphqlProvider, clock, githubApplicationAuthenticationProvider, server);
-        assertThatThrownBy(() -> testCase.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto))
+        assertThatThrownBy(() -> testCase.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto, null))
                 .hasMessage(
                 "An error was returned in the response from the Github API:" + System.lineSeparator() +
                 "- Error{message='example message', locations=[]}").isExactlyInstanceOf(IllegalStateException.class);
@@ -176,7 +177,7 @@ public class GraphqlCheckRunProviderTest {
 
         GraphqlCheckRunProvider testCase =
                 new GraphqlCheckRunProvider(graphqlProvider, clock, githubApplicationAuthenticationProvider, server);
-        assertThatThrownBy(() -> testCase.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto))
+        assertThatThrownBy(() -> testCase.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto,null))
                 .hasMessage("Unknown severity value: dummy")
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
@@ -417,7 +418,7 @@ public class GraphqlCheckRunProviderTest {
 
         GraphqlCheckRunProvider testCase =
                 new GraphqlCheckRunProvider(graphqlProvider, clock, githubApplicationAuthenticationProvider, server);
-        testCase.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto);
+        testCase.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto,null);
 
         assertEquals(1, requestBuilders.size());
 
@@ -575,7 +576,7 @@ public class GraphqlCheckRunProviderTest {
         when(almSettingDto.getPrivateKey()).thenReturn("private key");
 
         GraphqlCheckRunProvider testCase = new GraphqlCheckRunProvider(graphqlProvider, clock, githubApplicationAuthenticationProvider, server);
-        testCase.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto);
+        testCase.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto,null);
 
         ArgumentCaptor<Class<?>> classArgumentCaptor = ArgumentCaptor.forClass(Class.class);
         verify(graphQLTemplate, times(3)).mutate(any(GraphQLRequestEntity.class), classArgumentCaptor.capture());
@@ -603,7 +604,7 @@ public class GraphqlCheckRunProviderTest {
         ProjectAlmSettingDto projectAlmSettingDto = mock(ProjectAlmSettingDto.class);
 
         GraphqlCheckRunProvider underTest = new GraphqlCheckRunProvider(mock(Clock.class), mock(GithubApplicationAuthenticationProvider.class), mock(Server.class));
-        assertThatThrownBy(() -> underTest.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto))
+        assertThatThrownBy(() -> underTest.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto,null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("No URL has been set for Github connections");
     }
@@ -616,7 +617,7 @@ public class GraphqlCheckRunProviderTest {
         ProjectAlmSettingDto projectAlmSettingDto = mock(ProjectAlmSettingDto.class);
 
         GraphqlCheckRunProvider underTest = new GraphqlCheckRunProvider(mock(Clock.class), mock(GithubApplicationAuthenticationProvider.class), mock(Server.class));
-        assertThatThrownBy(() -> underTest.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto))
+        assertThatThrownBy(() -> underTest.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto,null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("No private key has been set for Github connections");
     }
@@ -630,7 +631,7 @@ public class GraphqlCheckRunProviderTest {
         ProjectAlmSettingDto projectAlmSettingDto = mock(ProjectAlmSettingDto.class);
 
         GraphqlCheckRunProvider underTest = new GraphqlCheckRunProvider(mock(Clock.class), mock(GithubApplicationAuthenticationProvider.class), mock(Server.class));
-        assertThatThrownBy(() -> underTest.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto))
+        assertThatThrownBy(() -> underTest.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto,null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("No repository name has been set for Github connections");
     }
@@ -645,7 +646,7 @@ public class GraphqlCheckRunProviderTest {
         when(projectAlmSettingDto.getAlmRepo()).thenReturn("alm/repo");
 
         GraphqlCheckRunProvider underTest = new GraphqlCheckRunProvider(mock(Clock.class), mock(GithubApplicationAuthenticationProvider.class), mock(Server.class));
-        assertThatThrownBy(() -> underTest.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto))
+        assertThatThrownBy(() -> underTest.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto,null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("No App ID has been set for Github connections");
     }
