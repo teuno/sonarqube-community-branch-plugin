@@ -28,6 +28,7 @@ import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.bitbucket.client.model
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.bitbucket.client.model.CreateReportRequest;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.bitbucket.client.model.DataValue;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.bitbucket.client.model.ReportData;
+import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.commentfilter.IssueFilterRunner;
 import org.sonar.api.ce.posttask.QualityGate;
 import org.sonar.api.issue.Issue;
 import org.sonar.api.measures.CoreMetrics;
@@ -74,6 +75,11 @@ public class BitbucketServerPullRequestDecorator implements PullRequestBuildStat
 
     @Override
     public DecorationResult decorateQualityGateStatus(AnalysisDetails analysisDetails, AlmSettingDto almSettingDto, ProjectAlmSettingDto projectAlmSettingDto) {
+        return decorateQualityGateStatus(analysisDetails, almSettingDto, projectAlmSettingDto, null);
+    }
+
+    @Override
+    public DecorationResult decorateQualityGateStatus(AnalysisDetails analysisDetails, AlmSettingDto almSettingDto, ProjectAlmSettingDto projectAlmSettingDto, IssueFilterRunner issueFilterRunner) {
         try {
             if(!client.supportsCodeInsights(almSettingDto)) {
                 LOGGER.warn("Your Bitbucket instances does not support the Code Insights API.");

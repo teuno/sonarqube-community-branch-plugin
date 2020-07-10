@@ -75,7 +75,7 @@ public class BitbucketPullRequestDecoratorTest {
         final ArgumentCaptor<CreateReportRequest> reportCaptor = ArgumentCaptor.forClass(CreateReportRequest.class);
         final ArgumentCaptor<CreateAnnotationsRequest> annotationsCaptor = ArgumentCaptor.forClass(CreateAnnotationsRequest.class);
 
-        underTest.decorateQualityGateStatus(analysisDetails, almSettingDto, projectAlmSettingDto);
+        underTest.decorateQualityGateStatus(analysisDetails, almSettingDto, projectAlmSettingDto, null);
 
         verify(client).createReport(eq(PROJECT), eq(REPO), eq(COMMIT), reportCaptor.capture(), eq(almSettingDto));
         verifyExpectedReport(reportCaptor.getValue());
