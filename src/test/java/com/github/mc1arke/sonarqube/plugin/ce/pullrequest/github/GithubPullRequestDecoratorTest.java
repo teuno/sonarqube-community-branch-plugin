@@ -58,7 +58,7 @@ public class GithubPullRequestDecoratorTest {
         Exception dummyException = new IOException("Dummy Exception");
         doThrow(dummyException).when(checkRunProvider).createCheckRun(any(), any(), any());
 
-        assertThatThrownBy(() -> testCase.decorateQualityGateStatus(analysisDetails, almSettingDto, projectAlmSettingDto))
+        assertThatThrownBy(() -> testCase.decorateQualityGateStatus(analysisDetails, almSettingDto, projectAlmSettingDto, null))
                 .hasMessage("Could not decorate Pull Request on Github")
                 .isExactlyInstanceOf(IllegalStateException.class).hasCause(dummyException);
     }
@@ -67,7 +67,7 @@ public class GithubPullRequestDecoratorTest {
     public void testDecorateQualityGateReturnValue() throws IOException, GeneralSecurityException {
         DecorationResult expectedResult = DecorationResult.builder().build();
         doReturn(expectedResult).when(checkRunProvider).createCheckRun(any(), any(), any());
-        DecorationResult decorationResult = testCase.decorateQualityGateStatus(analysisDetails, almSettingDto, projectAlmSettingDto);
+        DecorationResult decorationResult = testCase.decorateQualityGateStatus(analysisDetails, almSettingDto, projectAlmSettingDto, null);
 
         ArgumentCaptor<AnalysisDetails> argumentCaptor = ArgumentCaptor.forClass(AnalysisDetails.class);
         verify(checkRunProvider).createCheckRun(argumentCaptor.capture(), eq(almSettingDto), eq(projectAlmSettingDto));
