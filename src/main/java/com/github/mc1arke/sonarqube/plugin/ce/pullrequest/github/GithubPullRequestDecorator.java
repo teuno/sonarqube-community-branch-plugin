@@ -43,7 +43,7 @@ public class GithubPullRequestDecorator implements PullRequestBuildStatusDecorat
     public DecorationResult decorateQualityGateStatus(AnalysisDetails analysisDetails, AlmSettingDto almSettingDto,
                                                       ProjectAlmSettingDto projectAlmSettingDto, IssueFilterRunner issueFilterRunner) {
         try {
-            return checkRunProvider.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto);
+            return checkRunProvider.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto, issueFilterRunner);
         } catch (Exception ex) {
             throw new IllegalStateException("Could not decorate Pull Request on Github", ex);
         }
