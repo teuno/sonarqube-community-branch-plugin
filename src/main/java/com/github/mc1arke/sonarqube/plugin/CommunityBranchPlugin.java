@@ -21,21 +21,11 @@ package com.github.mc1arke.sonarqube.plugin;
 import com.github.mc1arke.sonarqube.plugin.ce.CommunityBranchEditionProvider;
 import com.github.mc1arke.sonarqube.plugin.ce.CommunityReportAnalysisComponentProvider;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.PullRequestPostAnalysisTask;
-import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.gitlab.GitlabServerPullRequestDecorator;
-import com.github.mc1arke.sonarqube.plugin.scanner.CommunityBranchConfigurationLoader;
-import com.github.mc1arke.sonarqube.plugin.scanner.CommunityBranchParamsValidator;
-import com.github.mc1arke.sonarqube.plugin.scanner.CommunityProjectBranchesLoader;
-import com.github.mc1arke.sonarqube.plugin.scanner.CommunityProjectPullRequestsLoader;
-import com.github.mc1arke.sonarqube.plugin.scanner.ScannerPullRequestPropertySensor;
+import com.github.mc1arke.sonarqube.plugin.scanner.*;
 import com.github.mc1arke.sonarqube.plugin.server.CommunityBranchFeatureExtension;
 import com.github.mc1arke.sonarqube.plugin.server.CommunityBranchSupportDelegate;
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.AlmSettingsWs;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.CountBindingAction;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.DeleteAction;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.DeleteBindingAction;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.GetBindingAction;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.ListAction;
-import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.ListDefinitionsAction;
+import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.*;
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.azure.CreateAzureAction;
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.azure.SetAzureBindingAction;
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action.azure.UpdateAzureAction;
@@ -59,8 +49,6 @@ import org.sonar.api.rules.RuleType;
 import org.sonar.core.config.PurgeConstants;
 import org.sonar.core.extension.CoreExtension;
 
-import java.util.Arrays;
-
 /**
  * @author Michael Clarke
  */
@@ -69,6 +57,7 @@ public class CommunityBranchPlugin implements Plugin, CoreExtension {
     public static final String IMAGE_URL_BASE = "com.github.mc1arke.sonarqube.plugin.branch.image-url-base";
     private static final String PULL_REQUEST_CATEGORY_LABEL = "Pull Request Decoration Filters";
     private static final String PULL_REQUEST_DECORATIONS_LABEL = "Filters";
+
     @Override
     public String getName() {
         return "Community Branch Plugin";
@@ -80,7 +69,6 @@ public class CommunityBranchPlugin implements Plugin, CoreExtension {
             context.addExtensions(CommunityReportAnalysisComponentProvider.class, CommunityBranchEditionProvider.class);
         } else if (SonarQubeSide.SERVER == context.getRuntime().getSonarQubeSide()) {
             context.addExtensions(CommunityBranchFeatureExtension.class, CommunityBranchSupportDelegate.class,
-
                     AlmSettingsWs.class, CountBindingAction.class, DeleteAction.class,
                     DeleteBindingAction.class, ListAction.class, ListDefinitionsAction.class,
                     GetBindingAction.class,
@@ -94,9 +82,9 @@ public class CommunityBranchPlugin implements Plugin, CoreExtension {
 
                     CreateGitlabAction.class, SetGitlabBindingAction.class, UpdateGitlabAction.class,
 
-                /* org.sonar.db.purge.PurgeConfiguration uses the value for the this property if it's configured, so it only
-                needs to be specified here, but doesn't need any additional classes to perform the relevant purge/cleanup
-                */
+                                /* org.sonar.db.purge.PurgeConfiguration uses the value for the this property if it's configured, so it only
+                                needs to be specified here, but doesn't need any additional classes to perform the relevant purge/cleanup
+                                */
                     PropertyDefinition
                             .builder(PurgeConstants.DAYS_BEFORE_DELETING_INACTIVE_BRANCHES_AND_PRS)
                             .name("Number of days before purging inactive short living branches")
@@ -105,34 +93,29 @@ public class CommunityBranchPlugin implements Plugin, CoreExtension {
                             .category(CoreProperties.CATEGORY_HOUSEKEEPING)
                             .subCategory(CoreProperties.SUBCATEGORY_GENERAL).defaultValue("30")
                             .type(PropertyType.INTEGER).build()
-
-
             );
-
         }
 
         if (SonarQubeSide.COMPUTE_ENGINE == context.getRuntime().getSonarQubeSide() ||
                 SonarQubeSide.SERVER == context.getRuntime().getSonarQubeSide()) {
             context.addExtensions(PropertyDefinition.builder(IMAGE_URL_BASE)
-                    .category(CoreProperties.CATEGORY_GENERAL)
-                    .subCategory(CoreProperties.SUBCATEGORY_GENERAL)
-                    .onQualifiers(Qualifiers.APP)
-                    .name("Images base URL")
-                    .description("Base URL used to load the images for the PR comments (please use this only if images are not displayed properly).")
-                    .type(PropertyType.STRING)
-                    .build(),
+                            .category(CoreProperties.CATEGORY_GENERAL)
+                            .subCategory(CoreProperties.SUBCATEGORY_GENERAL)
+                            .onQualifiers(Qualifiers.APP)
+                            .name("Images base URL")
+                            .description("Base URL used to load the images for the PR comments (please use this only if images are not displayed properly).")
+                            .type(PropertyType.STRING)
+                            .build(),
                     PropertyDefinition.builder(PullRequestPostAnalysisTask.PULLREQUEST_FILTER_TYPE_EXCLUSION).category(PULL_REQUEST_CATEGORY_LABEL).subCategory(PULL_REQUEST_DECORATIONS_LABEL)
                             .onQualifiers(Qualifiers.PROJECT).name("RuleType Exclusions").description("Comma-separated list of ruletypes you want to exclude, possible values: CODE_SMELL, BUG, VULNERABILITY, SECURITY_HOTSPOT")
-                            .type(PropertyType.STRING).options(RuleType.BUG.name(), RuleType.CODE_SMELL.name(), RuleType.VULNERABILITY.name(),RuleType.SECURITY_HOTSPOT.name()).build(),
+                            .type(PropertyType.STRING).options(RuleType.BUG.name(), RuleType.CODE_SMELL.name(), RuleType.VULNERABILITY.name(), RuleType.SECURITY_HOTSPOT.name()).build(),
                     PropertyDefinition.builder(PullRequestPostAnalysisTask.PULLREQUEST_FILTER_SEVERITY_EXCLUSION).category(PULL_REQUEST_CATEGORY_LABEL).subCategory(PULL_REQUEST_DECORATIONS_LABEL)
                             .onQualifiers(Qualifiers.PROJECT).name("Severity Exclusions").description("Comma-separated list of severity levels you want to exclude, possible values: INFO, MINOR, MAJOR, CRITICAL, BLOCKER")
                             .type(PropertyType.STRING).options(Severity.ALL).build(),
                     PropertyDefinition.builder(PullRequestPostAnalysisTask.PULLREQUEST_FILTER_MAXAMOUNT).category(PULL_REQUEST_CATEGORY_LABEL).subCategory(PULL_REQUEST_DECORATIONS_LABEL)
                             .onQualifiers(Qualifiers.PROJECT).name("Max amount").description("Max amount of comments to be added to the pull request, must be > 0")
                             .type(PropertyType.INTEGER).build()
-
             );
-
         }
     }
 

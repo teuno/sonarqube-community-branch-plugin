@@ -34,6 +34,19 @@ public class ReportData {
         this.type = typeFrom(value);
     }
 
+<<<<<<< HEAD
+=======
+    private static String typeFrom(DataValue value) {
+        if (value instanceof DataValue.Link || value instanceof DataValue.CloudLink) {
+            return "LINK";
+        } else if (value instanceof DataValue.Percentage) {
+            return "PERCENTAGE";
+        } else {
+            return "TEXT";
+        }
+    }
+
+>>>>>>> origin/bugfix/201-could-not-decorate-gitlab-merge-request
     public String getTitle() {
         return title;
     }
@@ -45,6 +58,7 @@ public class ReportData {
     public String getType() {
         return type;
     }
+<<<<<<< HEAD
 
     private static String typeFrom(DataValue value) {
         if (value instanceof DataValue.Link) {
@@ -55,4 +69,6 @@ public class ReportData {
             return "TEXT";
         }
     }
+=======
+>>>>>>> origin/bugfix/201-could-not-decorate-gitlab-merge-request
 }

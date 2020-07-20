@@ -367,7 +367,6 @@ public class PullRequestPostAnalysisTaskTest {
         when(dbClient.propertiesDao()).thenReturn(propertiesDao);
         when(propertiesDao.selectProjectProperties(any(), any())).thenReturn(projectProperties);
 
-
         DbSession dbSession = mock(DbSession.class);
         doReturn(dbSession).when(dbClient).openSession(anyBoolean());
         BranchDao branchDao = mock(BranchDao.class);
@@ -375,7 +374,6 @@ public class PullRequestPostAnalysisTaskTest {
         BranchDto branchDto = mock(BranchDto.class);
         doReturn(Optional.empty()).when(branchDao).selectByPullRequestKey(any(), any(), any());
         doReturn(DbProjectBranches.PullRequestData.newBuilder().build()).when(branchDto).getPullRequestData();
-
 
         testCase.finished(context);
 

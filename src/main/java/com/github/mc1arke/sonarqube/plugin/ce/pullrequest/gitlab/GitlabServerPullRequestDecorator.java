@@ -114,6 +114,7 @@ public class GitlabServerPullRequestDecorator implements PullRequestBuildStatusD
                             .orElseThrow(() -> new IllegalStateException(String.format(
                                     "Could not decorate Gitlab merge request. '%s' has not been set in scanner properties",
                                     PULLREQUEST_GITLAB_INSTANCE_URL))));
+
             final String apiToken = almSettingDto.getPersonalAccessToken();
             final String projectId = Optional.ofNullable(StringUtils.stripToNull(projectAlmSettingDto.getAlmRepo()))
                     .orElseGet(() -> analysis.getScannerProperty(PULLREQUEST_GITLAB_PROJECT_ID)
@@ -173,7 +174,6 @@ public class GitlabServerPullRequestDecorator implements PullRequestBuildStatusD
 
             if(issueFilterRunner != null)
                 openIssues = issueFilterRunner.filterIssues(openIssues);
-
 
             String summaryComment = analysis.createAnalysisSummary(new MarkdownFormatterFactory());
             List<NameValuePair> summaryContentParams = Collections

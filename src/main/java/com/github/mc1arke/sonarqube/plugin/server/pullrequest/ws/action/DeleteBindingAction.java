@@ -32,7 +32,7 @@ public class DeleteBindingAction extends ProjectWsAction {
     private final DbClient dbClient;
 
     public DeleteBindingAction(DbClient dbClient, UserSession userSession, ComponentFinder componentFinder) {
-        super("delete_binding", dbClient, componentFinder, userSession);
+        super("delete_binding", dbClient, componentFinder, userSession, true);
         this.dbClient = dbClient;
     }
 

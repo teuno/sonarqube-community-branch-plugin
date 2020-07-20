@@ -116,11 +116,11 @@ public class GraphqlCheckRunProvider implements CheckRunProvider {
         List<InputObject<Object>> annotations = createAnnotations(issues);
 
         InputObject.Builder<Object> checkRunOutputContentBuilder = graphqlProvider.createInputObject().put("title", "Quality Gate " +
-                                                                                                     (analysisDetails
-                                                                                                              .getQualityGateStatus() ==
-                                                                                                      QualityGate.Status.OK ?
-                                                                                                      "success" :
-                                                                                                      "failed"))
+                (analysisDetails
+                        .getQualityGateStatus() ==
+                        QualityGate.Status.OK ?
+                        "success" :
+                        "failed"))
                 .put("summary", analysisDetails.createAnalysisSummary(new MarkdownFormatterFactory()))
                 .put("annotations", annotations);
 
@@ -132,15 +132,15 @@ public class GraphqlCheckRunProvider implements CheckRunProvider {
         inputObjectArguments.put("name", "Sonarqube Results");
         inputObjectArguments.put("status", RequestableCheckStatusState.COMPLETED);
         inputObjectArguments.put("conclusion", QualityGate.Status.OK == analysisDetails.getQualityGateStatus() ?
-                                   CheckConclusionState.SUCCESS : CheckConclusionState.FAILURE);
+                CheckConclusionState.SUCCESS : CheckConclusionState.FAILURE);
         inputObjectArguments.put("detailsUrl", String.format("%s/dashboard?id=%s&pullRequest=%s", server.getPublicRootUrl(),
-                                                 URLEncoder.encode(analysisDetails.getAnalysisProjectKey(),
-                                                                   StandardCharsets.UTF_8.name()), URLEncoder
-                                                         .encode(analysisDetails.getBranchName(),
-                                                                 StandardCharsets.UTF_8.name())));
+                URLEncoder.encode(analysisDetails.getAnalysisProjectKey(),
+                        StandardCharsets.UTF_8.name()), URLEncoder
+                        .encode(analysisDetails.getBranchName(),
+                                StandardCharsets.UTF_8.name())));
         inputObjectArguments.put("startedAt", startedDateFormat.format(analysisDetails.getAnalysisDate()));
         inputObjectArguments.put("completedAt", DateTimeFormatter.ofPattern(DATE_TIME_PATTERN).withZone(ZoneId.of("UTC"))
-                        .format(clock.instant()));
+                .format(clock.instant()));
         inputObjectArguments.put("externalId", analysisDetails.getAnalysisId());
         inputObjectArguments.put("output", checkRunOutputContentBuilder.build());
 
@@ -161,16 +161,15 @@ public class GraphqlCheckRunProvider implements CheckRunProvider {
         GraphQLRequestEntity graphQLRequestEntity = graphQLRequestEntityBuilder.build();
 
         GraphQLResponseEntity<CreateCheckRun> graphQLResponseEntity = executeRequest((r, t) -> graphqlProvider.createGraphQLTemplate().mutate(r, t),
-                                                                                     graphQLRequestEntity, CreateCheckRun.class);
+                graphQLRequestEntity, CreateCheckRun.class);
 
         reportRemainingIssues(issues, graphQLResponseEntity.getResponse().getCheckRun().getId(),
-                              inputObjectArguments, checkRunOutputContentBuilder, graphQLRequestEntityBuilder);
+                inputObjectArguments, checkRunOutputContentBuilder, graphQLRequestEntityBuilder);
 
 
         return DecorationResult.builder()
                 .withPullRequestUrl(repositoryAuthenticationToken.getRepositoryUrl() + "/pull/" + analysisDetails.getBranchName())
                 .build();
-
     }
 
     private static <R> GraphQLResponseEntity<R> executeRequest(

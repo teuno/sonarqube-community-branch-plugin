@@ -18,10 +18,6 @@
  */
 package com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action;
 
-import static java.lang.String.format;
-
-import java.util.Optional;
-
 import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
@@ -37,6 +33,9 @@ import org.sonar.server.ws.WsUtils;
 import org.sonarqube.ws.AlmSettings.GetBindingWsResponse;
 
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.AlmTypeMapper;
+import java.util.Optional;
+
+import static java.lang.String.format;
 
 public class GetBindingAction extends ProjectWsAction {
 
@@ -48,7 +47,7 @@ public class GetBindingAction extends ProjectWsAction {
     }
 
     GetBindingAction(DbClient dbClient, ComponentFinder componentFinder, UserSession userSession, ProtoBufWriter protoBufWriter) {
-        super("get_binding", dbClient, componentFinder, userSession);
+        super("get_binding", dbClient, componentFinder, userSession, true);
         this.dbClient = dbClient;
         this.protoBufWriter = protoBufWriter;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Mathias Åhsberg
+ * Copyright (C) 2020 Marvin Wichmann
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,20 +18,13 @@
  */
 package com.github.mc1arke.sonarqube.plugin.ce.pullrequest.bitbucket.client;
 
-import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.bitbucket.client.model.server.ErrorResponse;
-
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-public class BitbucketException extends RuntimeException {
-    public static final int PAYLOAD_TOO_LARGE = 413;
-
+public class BitbucketCloudException extends RuntimeException {
     private final int code;
-    private final ErrorResponse errors;
+    private final String error;
 
-    BitbucketException(int code, ErrorResponse errors) {
+    BitbucketCloudException(int code, String error) {
         this.code = code;
-        this.errors = errors;
+        this.error = error;
     }
 
     public boolean isError(int code) {
@@ -40,11 +33,6 @@ public class BitbucketException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return Optional.ofNullable(errors)
-                .map(ErrorResponse::getErrors)
-                .map(e -> e.stream()
-                        .map(ErrorResponse.Error::getMessage)
-                        .collect(Collectors.joining(System.lineSeparator())))
-                .orElse(String.format("Bitbucket responded with an error status (%d)", code));
+        return "HTTP Status Code: " + code + "; Message:" + error;
     }
 }

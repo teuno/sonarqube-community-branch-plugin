@@ -21,8 +21,10 @@ package com.github.mc1arke.sonarqube.plugin.ce.pullrequest;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.commentfilter.IssueFilterRunner;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.commentfilter.SeverityExclusionFilter;
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.commentfilter.TypeExclusionFilter;
-import org.checkerframework.checker.nullness.Opt;
-import org.sonar.api.ce.posttask.*;
+import org.sonar.api.ce.posttask.Analysis;
+import org.sonar.api.ce.posttask.Branch;
+import org.sonar.api.ce.posttask.PostProjectAnalysisTask;
+import org.sonar.api.ce.posttask.QualityGate;
 import org.sonar.api.config.Configuration;
 import org.sonar.api.platform.Server;
 import org.sonar.api.utils.log.Logger;
@@ -39,11 +41,13 @@ import org.sonar.db.component.BranchDao;
 import org.sonar.db.component.BranchDto;
 import org.sonar.db.property.PropertyDto;
 import org.sonar.db.protobuf.DbProjectBranches;
-import org.sonar.server.setting.ws.Setting;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
+
 
 public class PullRequestPostAnalysisTask implements PostProjectAnalysisTask {
 
@@ -85,7 +89,6 @@ public class PullRequestPostAnalysisTask implements PostProjectAnalysisTask {
     @Override
     public void finished(Context context) {
         ProjectAnalysis projectAnalysis = context.getProjectAnalysis();
-
         LOGGER.debug("found " + pullRequestDecorators.size() + " pull request decorators");
         Optional<Branch> optionalPullRequest =
                 projectAnalysis.getBranch().filter(branch -> Branch.Type.PULL_REQUEST == branch.getType());
@@ -156,7 +159,6 @@ public class PullRequestPostAnalysisTask implements PostProjectAnalysisTask {
             return;
         }
 
-
         String commitId = revision.get();
 
         AnalysisDetails analysisDetails =
@@ -212,7 +214,6 @@ public class PullRequestPostAnalysisTask implements PostProjectAnalysisTask {
             return Optional.of(new IssueFilterRunner(filterList, optionalMaxAmount.orElse(null)));
         }
     }
-
 
     private static Optional<PullRequestBuildStatusDecorator> findCurrentPullRequestStatusDecorator(
             AlmSettingDto almSetting, List<PullRequestBuildStatusDecorator> pullRequestDecorators) {

@@ -18,11 +18,6 @@
  */
 package com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action;
 
-import static java.util.Optional.ofNullable;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
@@ -38,6 +33,11 @@ import org.sonarqube.ws.AlmSettings.ListWsResponse;
 
 import com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.AlmTypeMapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.Optional.ofNullable;
+
 public class ListAction extends ProjectWsAction {
 
     private final DbClient dbClient;
@@ -48,7 +48,7 @@ public class ListAction extends ProjectWsAction {
     }
 
     public ListAction(DbClient dbClient, UserSession userSession, ComponentFinder componentFinder, ProtoBufWriter protoBufWriter) {
-        super("list", dbClient, componentFinder, userSession);
+        super("list", dbClient, componentFinder, userSession, false);
         this.dbClient = dbClient;
         this.protoBufWriter = protoBufWriter;
     }

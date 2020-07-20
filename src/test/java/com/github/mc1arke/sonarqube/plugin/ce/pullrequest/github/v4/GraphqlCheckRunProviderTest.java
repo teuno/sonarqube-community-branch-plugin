@@ -131,7 +131,6 @@ public class GraphqlCheckRunProviderTest {
 
         verify(githubApplicationAuthenticationProvider)
                 .getInstallationToken(eq("http://host.name"), eq("app id"), eq("private key"), eq("dummy/repo"));
-
     }
 
     @Test
@@ -426,10 +425,10 @@ public class GraphqlCheckRunProviderTest {
 
         GraphqlCheckRunProvider testCase =
                 new GraphqlCheckRunProvider(graphqlProvider, clock, githubApplicationAuthenticationProvider, server);
+
         testCase.createCheckRun(analysisDetails, almSettingDto, projectAlmSettingDto,issueFilterRunner);
 
         if(issueFilterRunner != null) verify(issueFilterRunner, times(1)).filterIssues(issueList);
-
 
         assertEquals(1, requestBuilders.size());
 
