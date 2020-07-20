@@ -34,7 +34,7 @@ public abstract class SetBindingAction extends ProjectWsAction {
     private static final String ALM_SETTING_PARAMETER = "almSetting";
 
     protected SetBindingAction(DbClient dbClient, ComponentFinder componentFinder, UserSession userSession, String actionName) {
-        super(actionName, dbClient, componentFinder, userSession);
+        super(actionName, dbClient, componentFinder, userSession, true);
     }
 
     @Override
