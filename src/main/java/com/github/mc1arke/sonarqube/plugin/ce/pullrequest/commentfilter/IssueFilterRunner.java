@@ -2,6 +2,7 @@ package com.github.mc1arke.sonarqube.plugin.ce.pullrequest.commentfilter;
 
 import com.github.mc1arke.sonarqube.plugin.ce.pullrequest.PostAnalysisIssueVisitor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ public class IssueFilterRunner {
 
         if (maxAmountOfIssues != null && maxAmountOfIssues > 0) stream = stream.limit(maxAmountOfIssues);
 
-        return stream.collect(Collectors.toUnmodifiableList());
+        return Collections.unmodifiableList(stream.collect(Collectors.toList()));
     }
 
     public List<Predicate<PostAnalysisIssueVisitor.ComponentIssue>> getFilters() {
