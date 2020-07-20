@@ -5,6 +5,7 @@ import org.sonar.api.rule.Severity;
 import org.sonar.api.rules.RuleType;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -20,13 +21,13 @@ public class TypeExclusionFilter implements Predicate<PostAnalysisIssueVisitor.C
     private List<RuleType> parseString(String typeExclusionString) {
         List<String> typeExclusionStringList = Arrays.asList(typeExclusionString.split(","));
 
-        return typeExclusionStringList.stream()
+        return Collections.unmodifiableList(typeExclusionStringList.stream()
                 .map(String::trim)
                 .map(String::toUpperCase)
                 .filter(string ->
                         RuleType.names().contains(string))
                 .map(RuleType::valueOf)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList()));
     }
 
     @Override

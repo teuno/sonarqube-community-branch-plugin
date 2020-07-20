@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import org.sonar.api.rule.Severity;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -21,11 +22,11 @@ public class SeverityExclusionFilter implements Predicate<PostAnalysisIssueVisit
     private List<String> parseString(String severityString) {
         List<String> severityStringList = Arrays.asList(severityString.split(","));
 
-        return severityStringList.stream()
+        return Collections.unmodifiableList(severityStringList.stream()
                 .map(String::trim)
                 .map(String::toUpperCase)
                 .filter(Severity.ALL::contains)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList()));
     }
 
     @Override
