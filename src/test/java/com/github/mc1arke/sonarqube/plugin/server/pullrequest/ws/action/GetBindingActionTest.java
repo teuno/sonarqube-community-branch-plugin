@@ -1,17 +1,6 @@
 package com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
+import com.google.protobuf.Message;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -31,7 +20,17 @@ import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.user.UserSession;
 import org.sonarqube.ws.AlmSettings;
 
-import com.google.protobuf.Message;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class GetBindingActionTest {
 
@@ -93,7 +92,7 @@ public class GetBindingActionTest {
         Response response = mock(Response.class, Mockito.RETURNS_DEEP_STUBS);
 
         when(request.mandatoryParam("almSetting")).thenReturn("almSetting");
-        when(request.mandatoryParam("project")).thenReturn("project");
+        when(request.param("project")).thenReturn("project");
         when(request.getMediaType()).thenReturn("dummy");
 
         testCase.handle(request, response);
@@ -110,6 +109,45 @@ public class GetBindingActionTest {
             .setSlug("slug")
             .build();
         assertThat(message).isInstanceOf(AlmSettings.GetBindingWsResponse.class).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    public void testHandleMissingProjectParameter() {
+        DbClient dbClient = mock(DbClient.class);
+        DbSession dbSession = mock(DbSession.class);
+        when(dbClient.openSession(eq(false))).thenReturn(dbSession);
+        AlmSettingDao almSettingDao = mock(AlmSettingDao.class);
+        AlmSettingDto almSettingDto = mock(AlmSettingDto.class);
+        when(almSettingDto.getUuid()).thenReturn("almSettingsUuid");
+        when(almSettingDao.selectByUuid(eq(dbSession), eq("almSettingUuid"))).thenReturn(Optional.of(almSettingDto));
+        when(almSettingDto.getAlm()).thenReturn(ALM.GITHUB);
+        when(almSettingDto.getKey()).thenReturn("key");
+        when(almSettingDto.getUrl()).thenReturn("url");
+        when(dbClient.almSettingDao()).thenReturn(almSettingDao);
+        ProjectDto projectDto = mock(ProjectDto.class);
+        ProjectAlmSettingDao projectAlmSettingDao = mock(ProjectAlmSettingDao.class);
+        when(dbClient.projectAlmSettingDao()).thenReturn(projectAlmSettingDao);
+        ComponentFinder componentFinder = mock(ComponentFinder.class);
+        when(projectDto.getKey()).thenReturn("projectUuid");
+        when(componentFinder.getProjectByKey(eq(dbSession), eq("project"))).thenReturn(projectDto);
+        UserSession userSession = mock(UserSession.class);
+        ProjectAlmSettingDto projectAlmSettingDto = mock(ProjectAlmSettingDto.class);
+        when(projectAlmSettingDto.getAlmSettingUuid()).thenReturn("almSettingUuid");
+        when(projectAlmSettingDto.getAlmRepo()).thenReturn("repository");
+        when(projectAlmSettingDto.getAlmSlug()).thenReturn("slug");
+        when(projectAlmSettingDao.selectByProject(eq(dbSession), eq(projectDto))).thenReturn(Optional.of(projectAlmSettingDto));
+        ProtoBufWriter protoBufWriter = mock(ProtoBufWriter.class);
+
+        GetBindingAction testCase = new GetBindingAction(dbClient, componentFinder, userSession, protoBufWriter);
+
+        Request request = mock(Request.class, Mockito.RETURNS_DEEP_STUBS);
+        Response response = mock(Response.class, Mockito.RETURNS_DEEP_STUBS);
+
+        when(request.mandatoryParam("almSetting")).thenReturn("almSetting");
+        when(request.getMediaType()).thenReturn("dummy");
+
+        assertThatThrownBy(() -> testCase.handle(request, response))
+                .isInstanceOf(IllegalArgumentException.class).hasMessage("The 'project' parameter is missing");
     }
 
     @Test
@@ -136,7 +174,7 @@ public class GetBindingActionTest {
         Response response = mock(Response.class, Mockito.RETURNS_DEEP_STUBS);
 
         when(request.mandatoryParam("almSetting")).thenReturn("almSetting");
-        when(request.mandatoryParam("project")).thenReturn("project");
+        when(request.param("project")).thenReturn("project");
         when(request.getMediaType()).thenReturn("dummy");
 
         assertThatThrownBy(() -> testCase.handle(request, response)).isInstanceOf(NotFoundException.class).hasMessage("Project 'project' is not bound to any ALM");
@@ -172,7 +210,7 @@ public class GetBindingActionTest {
         Response response = mock(Response.class, Mockito.RETURNS_DEEP_STUBS);
 
         when(request.mandatoryParam("almSetting")).thenReturn("almSetting");
-        when(request.mandatoryParam("project")).thenReturn("project");
+        when(request.param("project")).thenReturn("project");
         when(request.getMediaType()).thenReturn("dummy");
 
         assertThatThrownBy(() -> testCase.handle(request, response)).isInstanceOf(IllegalStateException.class).hasMessage("ALM setting 'settingUuid' cannot be found");

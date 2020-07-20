@@ -1,10 +1,5 @@
 package com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.action;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sonar.api.server.ws.Request;
@@ -17,6 +12,11 @@ import org.sonar.db.alm.setting.ProjectAlmSettingDao;
 import org.sonar.db.project.ProjectDto;
 import org.sonar.server.component.ComponentFinder;
 import org.sonar.server.user.UserSession;
+
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class DeleteBindingActionTest {
 
@@ -65,7 +65,7 @@ public class DeleteBindingActionTest {
         DeleteBindingAction testCase = new DeleteBindingAction(dbClient, userSession, componentFinder);
 
         Request request = mock(Request.class, Mockito.RETURNS_DEEP_STUBS);
-        when(request.mandatoryParam("project")).thenReturn("projectKey");
+        when(request.param("project")).thenReturn("projectKey");
         Response response = mock(Response.class, Mockito.RETURNS_DEEP_STUBS);
 
         testCase.handle(request, response);
