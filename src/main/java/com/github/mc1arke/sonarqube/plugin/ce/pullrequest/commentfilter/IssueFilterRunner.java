@@ -9,14 +9,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class IssueFilterRunner {
-    private List<Predicate<PostAnalysisIssueVisitor.ComponentIssue>> filters;
+    private final List<Predicate<PostAnalysisIssueVisitor.ComponentIssue>> filters;
     private Integer maxAmountOfIssues;
-    private SeverityComparator severityComparator;
-    private TypeComparator typeComparator;
+    private final SeverityComparator severityComparator;
+    private final TypeComparator typeComparator;
 
     public IssueFilterRunner(List<Predicate<PostAnalysisIssueVisitor.ComponentIssue>> filters, Integer maxAmountOfIssues) {
         this.filters = filters;
         this.maxAmountOfIssues = maxAmountOfIssues;
+        this.severityComparator = new SeverityComparator();
+        this.typeComparator = new TypeComparator();
     }
 
     public IssueFilterRunner(
@@ -32,10 +34,8 @@ public class IssueFilterRunner {
             List<Predicate<PostAnalysisIssueVisitor.ComponentIssue>> filters, Integer maxAmountOfIssues,
             SeverityComparator severityComparator,
             TypeComparator typeComparator) {
-        this.filters = filters;
+        this(filters, severityComparator, typeComparator);
         this.maxAmountOfIssues = maxAmountOfIssues;
-        this.severityComparator = severityComparator;
-        this.typeComparator = typeComparator;
     }
 
     public List<PostAnalysisIssueVisitor.ComponentIssue> filterIssues(List<PostAnalysisIssueVisitor.ComponentIssue> issues) {
